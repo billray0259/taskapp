@@ -23,7 +23,6 @@ export function JoinHouseForm(args) {
                 />
                 <Button
                     onPress={() => {
-                        console.log("Clicked Join House");
                         joinHouse(user, houseCode).then((message) => {
                             onSubmit();
                         });

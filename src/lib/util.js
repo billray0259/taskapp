@@ -6,7 +6,6 @@ export function generateNewOccupant(memberDisplayName, effortScores) {
     }
 
     const now = Date.now()/1000;
-    console.log("new occupant", now);
 
     return {
         displayName: memberDisplayName,

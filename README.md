@@ -160,14 +160,3 @@ Equitably assign tasks to roommates. Collaboratively create a list of periodic t
                 * time_completed: <time_completed>
 
     * …
-
-
-## TODO
-
-* invite/join house with link
-    * Setup test dynamic link
-    * Create dynamic link that joins a house
-    * programatically create a dynamic link that joins a newly created house
-
-* Leave house
-    * Select house to leave

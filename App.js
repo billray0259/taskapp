@@ -28,9 +28,6 @@ export default function App() {
     const [authUser, setAuthUser] = authUserState;
     
     function onAuthStateChanged(user) {
-        console.log("AUTH STATE CHANGED");
-        if (user)
-            console.log(user.email);
         setAuthUser(user);
     }
 
@@ -40,8 +37,6 @@ export default function App() {
     }, []);
 
     let initialPage = authUser ? "Home" : "Login";
-
-    console.log(initialPage);
 
     return (
         <SafeAreaProvider>

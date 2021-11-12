@@ -18,7 +18,6 @@ export function JoinHouse({ navigation }) {
     };
 
     const pressJoinHouse = () => {
-        console.log("Clicked Join House");
         joinHouse(user, houseCode).then(() => {
             navigation.goBack();
         });

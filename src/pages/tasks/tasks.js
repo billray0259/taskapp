@@ -23,7 +23,6 @@ export function Tasks({route, navigation}) {
 
     if (houseDoc === undefined) {
         firestore().collection("houses").doc(houseID).get().then(function (doc) {
-            console.log("Updating house doc");
             setHouseDoc(doc);
         });
         return <ActivityIndicator size="large" style={{flex:1}} />

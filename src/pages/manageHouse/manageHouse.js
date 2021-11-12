@@ -23,7 +23,6 @@ export function ManageHouse({ navigation }) {
 
 
     if (memberDoc === undefined) {
-        console.log("updating member doc");
         firestore().collection('members').doc(user.uid).get().then(doc => {
             setMemberDoc(doc);
         });

@@ -22,8 +22,6 @@ export function Home({ navigation }) {
             <Text>{message}</Text>
             <Button
                 onPress={() => {
-                    console.log("Clicked logout");
-
                     auth().signOut().then(() => {
                         console.log("Logged out");
                     }).catch(error => {
@@ -42,7 +40,6 @@ export function Home({ navigation }) {
             />
             <Button
                 onPress={() => {
-                    console.log("Clicked manage house");
                     navigation.navigate("Manage House");
                 }}
                 title="Manage Houses"

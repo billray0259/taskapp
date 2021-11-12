@@ -54,7 +54,6 @@ export function Login({ navigation }) {
             />
             <Button
                 onPress={() => {
-                    console.log("Clicked register");
                     navigation.navigate("Register");
                 }}
                 title="Register"

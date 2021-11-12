@@ -130,7 +130,6 @@ function EditTaskForm(args) {
 }
 
 function submitEdit(houseDoc, taskID, taskName, taskDescription, period, lastCompleted) {
-    console.log(period, lastCompleted);
     if (!validateTask(taskName, taskDescription, period, lastCompleted)) {
         return false;
     }
