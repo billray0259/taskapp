@@ -10,29 +10,29 @@ function HouseListItem(args) {
     const house = houseDoc.data();
     const [isActive, setIsActive] = useState(house.occupants[user.uid].isActive);
     
-    async function toggleUserActiveStatus(houseID, userID) {
+    async function toggleUserActiveStatus(houseID, memberID) {
         const houseDoc = await firestore().collection("houses").doc(houseID).get();
         const house = houseDoc.data();
-        const isActive = house.occupants[userID].isActive;
-    
+        const isActive = house.occupants[memberID].isActive;
+        const nowSeconds = Date.now()/1000;
+
         if (isActive) {
-            const lastActivated = house.occupants[userID].lastActivated;
-            const activeSeconds = house.occupants[userID].activeSeconds;
-            const now = new Date();
-            const ellapsedSeconds = (now.getTime() - lastActivated.getTime()) / 1000;
-            const newActiveSeconds = activeSeconds + ellapsedSeconds;
+            const lastActivatedSeconds = house.occupants[memberID].lastActivated;
+            const activeSeconds = house.occupants[memberID].activeSeconds;
+            const ellapsedSeconds =(nowSeconds - lastActivatedSeconds);
+            const newActiveSeconds = Math.round(activeSeconds + ellapsedSeconds);
             await firestore().collection("houses").doc(houseID).update({
-                ["occupants." + userID + ".activeSeconds"]: newActiveSeconds,
-                ["occupants." + userID + ".isActive"]: false,
+                ["occupants." + memberID + ".activeSeconds"]: newActiveSeconds,
+                ["occupants." + memberID + ".isActive"]: false,
             });
         } else {
             await firestore().collection("houses").doc(houseID).update({
-                ["occupants." + userID + ".lastActivated"]: now,
-                ["occupants." + userID + ".isActive"]: true,
+                ["occupants." + memberID + ".lastActivated"]: nowSeconds,
+                ["occupants." + memberID + ".isActive"]: true,
             });
         }
 
-        await firestore().collection("members").doc(userID).update({
+        await firestore().collection("members").doc(memberID).update({
             ["houses." + houseID + ".isActive"]: !isActive,
         });
     }
@@ -45,9 +45,7 @@ function HouseListItem(args) {
             <CheckBox
                 checked={isActive}
                 onPress={() => {
-                    firestore().collection("houses").doc(house.id).update({
-                        ["occupants." + user.uid + ".isActive"]: !isActive
-                    }).then(() => {
+                    toggleUserActiveStatus(houseDoc.id, user.uid).then(() => {
                         setIsActive(!isActive);
                     });
                 }}

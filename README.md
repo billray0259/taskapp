@@ -171,6 +171,3 @@ Equitably assign tasks to roommates. Collaboratively create a list of periodic t
 
 * Leave house
     * Select house to leave
-
-* toggle houses
-    * Make the active status checkbox affect your active seconds
