@@ -7,7 +7,7 @@ import { Button } from 'react-native-elements';
 import { ButtonPage } from '../../lib/buttonPage';
 
 import { styles } from '../../styles';
-import { getAverageEffortScoreGivenTask } from '../../lib/util';
+import { generateNewOccupant, getAverageEffortScoreGivenTask } from '../../lib/util';
 
 export function JoinHouse({ navigation }) {
     const [houseCode, setHouseCode] = useState('');
@@ -68,21 +68,24 @@ async function joinHouse(user, houseCode) {
         effortScores[taskID] = getAverageEffortScoreGivenTask(houseDoc, taskID);
     }
 
-    house.occupants[memberDoc.id] = {
-        displayName: member.displayName,
-        isActive: true,
-        activeSeconds: 0,
-        lastActivated: new Date(),
-        nSummedPoints: 0,
-        lastSummedTime: new Date(),
-        effortScores: effortScores,
-    };
+    house.occupants[memberDoc.id] = generateNewOccupant(member.displayName, effortScores);
+    // {
+    //     displayName: member.displayName,
+    //     isActive: true,
+    //     activeSeconds: 0,
+    //     lastActivated: now,
+    //     nSummedPoints: 0,
+    //     lastSummedTime: now,
+    //     effortScores: effortScores,
+    // };
 
     if (member.houses[houseDoc.id] !== undefined) {
         return "Member already in house";
     }
 
-    member.houses[houseDoc.id] = true;
+    member.houses[houseDoc.id] = {
+        isActive: true
+    };
 
     await Promise.all([
         firestore().collection("houses").doc(houseDoc.id).update({

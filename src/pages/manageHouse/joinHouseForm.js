@@ -75,7 +75,9 @@ async function joinHouse(user, houseCode) {
         return "Member already in house";
     }
 
-    member.houses[houseDoc.id] = true;
+    member.houses[houseDoc.id] = {
+        isActive: true,
+    };
 
     await Promise.all([
         firestore().collection("houses").doc(houseDoc.id).update({

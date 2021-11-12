@@ -1,5 +1,24 @@
 
 
+export function generateNewOccupant(memberDisplayName, effortScores) {
+    if (effortScores === undefined) {
+        effortScores = {};
+    }
+
+    const now = Date.now()/1000;
+    console.log("new occupant", now);
+
+    return {
+        displayName: memberDisplayName,
+        nSummedPoints: 0,
+        lastSummedTime: now,
+        activeSeconds: 0,
+        lastActivated: now,
+        isActive: true,
+        effortScores: effortScores,
+    }
+}
+
 export function generateRandomCode(length, characters) {
     if (characters === undefined) {
         characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

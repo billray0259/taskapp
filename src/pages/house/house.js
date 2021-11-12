@@ -1,14 +1,15 @@
 import React from 'react';
 import { Text, View, ActivityIndicator, Alert } from 'react-native';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import firestore from "@react-native-firebase/firestore";
 import { ButtonGroup, ListItem } from 'react-native-elements';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '../../styles';
 import Clipboard from '@react-native-community/clipboard'
-
+import { AuthContext } from '../../contexts/authContext';
 
 export function House({route, navigation }) {
+    const [user, setUser] = useContext(AuthContext);
     const { houseID } = route.params;
     const [houseDoc, setHouseDoc] = useState();
 
@@ -44,11 +45,6 @@ export function House({route, navigation }) {
         </View>
     );
 
-    const leaveHouse = () => {
-        // Update the house
-        // Update the members
-    }
-
     return (
         <SafeAreaView
             style={styles.container}
@@ -65,8 +61,10 @@ export function House({route, navigation }) {
                         case 0:
                             Alert.alert("Leave House", "Are you sure you want to leave this house?", [
                                 {text: "Cancel", style: "cancel"},
-                                {text: "Delete", onPress: () => {
-                                    Alert.alert("TODO Implement house deletion");
+                                {text: "Leave", onPress: () => {
+                                    leaveHouse(houseID, user.uid).then(() => {
+                                        navigation.navigate("Manage House");
+                                    });
                                     }
                                 }
                             ]);
@@ -86,4 +84,42 @@ export function House({route, navigation }) {
             />
         </SafeAreaView>
     );
+}
+
+async function leaveHouse(houseID, memberID) {
+    const [houseDoc, memberDoc] = await Promise.all([
+        firestore().collection("houses").doc(houseID).get(),
+        firestore().collection("members").doc(memberID).get()
+    ]);
+
+    const house = houseDoc.data();
+    const member = memberDoc.data();
+    
+    if (house.occupants[memberID] === undefined) {
+        Alert.alert("Error", "You are not in this house.");
+        return;
+    }
+
+    delete house.occupants[memberID];
+
+    const promises = [];
+
+    if (Object.keys(house.occupants).length === 0) {
+        // delete house
+        promises.push(firestore().collection("houses").doc(houseID).delete());
+    }
+    else {
+        // update house
+        promises.push(firestore().collection("houses").doc(houseID).update({
+            occupants: house.occupants
+        }));
+    }
+
+    delete member.houses[houseID];
+
+    promises.push(firestore().collection("members").doc(memberID).update({
+        houses: member.houses
+    }));
+
+    await Promise.all(promises);
 }

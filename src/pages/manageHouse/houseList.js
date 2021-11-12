@@ -6,9 +6,9 @@ import { CheckBox } from "react-native-elements/dist/checkbox/CheckBox";
 
 
 function HouseListItem(args) {
-    const {user, houseDoc, onPress} = args;
+    const {memberDoc, houseDoc, onPress} = args;
     const house = houseDoc.data();
-    const [isActive, setIsActive] = useState(house.occupants[user.uid].isActive);
+    const [isActive, setIsActive] = useState(house.occupants[memberDoc.id].isActive);
     
     async function toggleUserActiveStatus(houseID, memberID) {
         const houseDoc = await firestore().collection("houses").doc(houseID).get();
@@ -19,8 +19,8 @@ function HouseListItem(args) {
         if (isActive) {
             const lastActivatedSeconds = house.occupants[memberID].lastActivated;
             const activeSeconds = house.occupants[memberID].activeSeconds;
-            const ellapsedSeconds =(nowSeconds - lastActivatedSeconds);
-            const newActiveSeconds = Math.round(activeSeconds + ellapsedSeconds);
+            const ellapsedSeconds = nowSeconds - lastActivatedSeconds;
+            const newActiveSeconds = activeSeconds + ellapsedSeconds;
             await firestore().collection("houses").doc(houseID).update({
                 ["occupants." + memberID + ".activeSeconds"]: newActiveSeconds,
                 ["occupants." + memberID + ".isActive"]: false,
@@ -45,7 +45,7 @@ function HouseListItem(args) {
             <CheckBox
                 checked={isActive}
                 onPress={() => {
-                    toggleUserActiveStatus(houseDoc.id, user.uid).then(() => {
+                    toggleUserActiveStatus(houseDoc.id, memberDoc.id).then(() => {
                         setIsActive(!isActive);
                     });
                 }}
@@ -56,16 +56,9 @@ function HouseListItem(args) {
 }
 
 export function HouseList(args) {
-    const {user, navigation} = args;
-    const [member, setMember] = useState(undefined);
+    const {memberDoc, navigation} = args;
     const [houseDocuments, setHouseDocuments] = useState(undefined);
-
-    if (member === undefined) {
-        firestore().collection("members").doc(user.uid).get().then((memberDoc) => {
-            setMember(memberDoc.data());
-        });
-        return <ActivityIndicator size="large" style={{flex:1}} />
-    }
+    const member = memberDoc.data();
     
 
     if (houseDocuments === undefined) {
@@ -90,7 +83,7 @@ export function HouseList(args) {
             <FlatList
                 data={houseDocuments}
                 renderItem={({item}) => (
-                    <HouseListItem user={user} houseDoc={item} onPress={() => {
+                    <HouseListItem memberDoc={memberDoc} houseDoc={item} onPress={() => {
                         navigation.navigate("House", {houseID: item.id});
                     }}/>
                 )}

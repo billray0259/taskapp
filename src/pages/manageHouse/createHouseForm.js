@@ -5,6 +5,7 @@ import { View, Text, TextInput } from "react-native";
 import { Button } from 'react-native-elements';
 
 import { styles } from '../../styles';
+import { generateNewOccupant } from '../../lib/util';
 
 export function CreateHouseForm(args) {
     const {user, onSubmit} = args;
@@ -33,22 +34,14 @@ export function CreateHouseForm(args) {
 
 async function createHouse(user, houseName) {
     const houseCode = generateRandomCode(6);
-    const member = await firestore().collection("members").doc(user.uid).get();
-    const now = Date.now();
+    const memberDoc = await firestore().collection("members").doc(user.uid).get();
+    const member = memberDoc.data();
 
     firestore().collection("houses").add({
         houseName: houseName,
         houseCode: houseCode,
         occupants: {
-            [user.uid]: {
-                displayName: member.data().displayName,
-                nSummedPoints: 0,
-                lastSummedTime: now,
-                activeSeconds: 0,
-                lastActivated: now,
-                isActive: true,
-                effortScores: {},
-            }
+            [user.uid]: generateNewOccupant(member.displayName)
         },
         tasks: {},
         records: {},
@@ -60,7 +53,9 @@ async function createHouse(user, houseName) {
 async function addActiveHouseToMember(house, member) {
     // const member = await firestore().collection("members").doc(userId).get();
     const houses = member.data().houses;
-    houses[house.id] = true;
+    houses[house.id] = {
+        isActive: true,
+    };
     firestore().collection("members").doc(member.id).update({
         houses: houses,
     });
