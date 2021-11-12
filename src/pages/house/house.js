@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '../../styles';
 import Clipboard from '@react-native-community/clipboard'
 import { AuthContext } from '../../contexts/authContext';
+import { ButtonPage } from '../../lib/buttonPage';
 
 export function House({route, navigation }) {
     const [user, setUser] = useContext(AuthContext);
@@ -25,8 +26,43 @@ export function House({route, navigation }) {
     // the occupant object has keys: displayName, isActive
 
     // Show a list of all the occupants in the house using a ListItem
-    const occupantList = (
-        <View>
+    // const occupantList = (
+        
+    // );
+
+    const onLeave = () => {
+        Alert.alert("Leave House", "Are you sure you want to leave this house?", [
+            {text: "Cancel", style: "cancel"},
+            {text: "Leave", onPress: () => {
+                leaveHouse(houseID, user.uid).then(() => {
+                    navigation.navigate("Manage House");
+                });
+                }
+            }
+        ]);
+    }
+
+    const onInvite = () => {
+        Alert.alert("Share your House Code", "House Code: " + house.houseCode, [
+            {text: "Copy House Code", onPress: () => {
+                Clipboard.setString(house.houseCode);
+            }}
+        ]);
+    }
+
+    const onTasks = () => {
+        navigation.navigate("Tasks", {houseID: houseID});
+    }
+
+    const buttonLabels = ["Invite", "Leave", "Tasks"];
+    const buttonFunctions = [onInvite, onLeave, onTasks];
+
+    return (
+        <ButtonPage
+            buttonLabels={buttonLabels}
+            buttonFunctions={buttonFunctions}        
+        >
+            <Text style={styles.title}>{houseDoc.data().houseName}</Text>
             {Object.keys(house.occupants).map((occupantID) => {
                 const occupant = house.occupants[occupantID];
                 return (
@@ -42,48 +78,48 @@ export function House({route, navigation }) {
                     </ListItem>
                 );
             })}
-        </View>
+        </ButtonPage>
     );
 
-    return (
-        <SafeAreaView
-            style={styles.container}
-            edges={['bottom', 'left', 'right']}
-        >
-            <View style={{flexGrow: 1}}>
-                <Text style={styles.title}>{houseDoc.data().houseName}</Text>
-                {occupantList}
-            </View>
-            <ButtonGroup
-                buttons={["Leave", "Invite", "Tasks"]}
-                onPress={(index) => {
-                    switch (index) {
-                        case 0:
-                            Alert.alert("Leave House", "Are you sure you want to leave this house?", [
-                                {text: "Cancel", style: "cancel"},
-                                {text: "Leave", onPress: () => {
-                                    leaveHouse(houseID, user.uid).then(() => {
-                                        navigation.navigate("Manage House");
-                                    });
-                                    }
-                                }
-                            ]);
-                            break;
-                        case 1:
-                            Alert.alert("Share your House Code", "House Code: " + house.houseCode, [
-                                {text: "Copy House Code", onPress: () => {
-                                    Clipboard.setString(house.houseCode);
-                                }}
-                            ]);
-                            break;
-                        case 2:
-                            navigation.navigate("Tasks", {houseID: houseID});
-                            break;
-                    }
-                }}
-            />
-        </SafeAreaView>
-    );
+    // return (
+    //     <SafeAreaView
+    //         style={styles.container}
+    //         edges={['bottom', 'left', 'right']}
+    //     >
+    //         <View style={{flexGrow: 1}}>
+    //             <Text style={styles.title}>{houseDoc.data().houseName}</Text>
+    //             {occupantList}
+    //         </View>
+    //         <ButtonGroup
+    //             buttons={["Leave", "Invite", "Tasks"]}
+    //             onPress={(index) => {
+    //                 switch (index) {
+    //                     case 0:
+    //                         Alert.alert("Leave House", "Are you sure you want to leave this house?", [
+    //                             {text: "Cancel", style: "cancel"},
+    //                             {text: "Leave", onPress: () => {
+    //                                 leaveHouse(houseID, user.uid).then(() => {
+    //                                     navigation.navigate("Manage House");
+    //                                 });
+    //                                 }
+    //                             }
+    //                         ]);
+    //                         break;
+    //                     case 1:
+    //                         Alert.alert("Share your House Code", "House Code: " + house.houseCode, [
+    //                             {text: "Copy House Code", onPress: () => {
+    //                                 Clipboard.setString(house.houseCode);
+    //                             }}
+    //                         ]);
+    //                         break;
+    //                     case 2:
+    //                         navigation.navigate("Tasks", {houseID: houseID});
+    //                         break;
+    //                 }
+    //             }}
+    //         />
+    //     </SafeAreaView>
+    // );
 }
 
 async function leaveHouse(houseID, memberID) {

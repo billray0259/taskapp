@@ -44,6 +44,12 @@ export function Home({ navigation }) {
                 }}
                 title="Manage Houses"
             />
+            <Button
+                onPress={() => {
+                    navigation.navigate("Assignments");
+                }}
+                title="Assignments"
+            />
         </View>
     );
 }
