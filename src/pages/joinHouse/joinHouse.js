@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import firestore from "@react-native-firebase/firestore";
 import { useState } from "react";
 import { View, Text, TextInput } from "react-native";
 import { Button } from 'react-native-elements';
 
 import { ButtonPage } from '../../lib/buttonPage';
-
+import { AuthContext } from '../../contexts/authContext';
 import { styles } from '../../styles';
 import { generateNewOccupant, getAverageEffortScoreGivenTask } from '../../lib/util';
 
 export function JoinHouse({ navigation }) {
+    const [user, setUser] = useContext(AuthContext);
     const [houseCode, setHouseCode] = useState('');
 
 

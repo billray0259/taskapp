@@ -2,8 +2,7 @@ import React from 'react';
 import { Text, View, ActivityIndicator, Alert } from 'react-native';
 import { useState, useContext } from 'react';
 import firestore from "@react-native-firebase/firestore";
-import { ButtonGroup, ListItem } from 'react-native-elements';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ListItem } from 'react-native-elements';
 import { styles } from '../../styles';
 import Clipboard from '@react-native-community/clipboard'
 import { AuthContext } from '../../contexts/authContext';

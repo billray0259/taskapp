@@ -1,8 +1,7 @@
 import React from 'react';
 import firestore from "@react-native-firebase/firestore";
 import { useState, useContext } from "react";
-import { View, Text, TextInput } from "react-native";
-import { Button } from 'react-native-elements';
+import { Text, TextInput } from "react-native";
 
 import { styles } from '../../styles';
 import { ButtonPage } from '../../lib/buttonPage';
@@ -47,7 +46,6 @@ async function createHouse(user, houseName) {
     const houseCode = generateRandomCode(6);
     const memberDoc = await firestore().collection("members").doc(user.uid).get();
     const member = memberDoc.data();
-    const now = Date.now();
 
     await firestore().collection("houses").add({
         houseName: houseName,

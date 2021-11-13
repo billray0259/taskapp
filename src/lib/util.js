@@ -5,14 +5,14 @@ export function generateNewOccupant(memberDisplayName, effortScores) {
         effortScores = {};
     }
 
-    const now = Date.now()/1000;
+    const nowDays = Date.now() / (60 * 60 * 24 * 1000);
 
     return {
         displayName: memberDisplayName,
         nSummedPoints: 0,
-        lastSummedTime: now,
-        activeSeconds: 0,
-        lastActivated: now,
+        lastSummedTime: nowDays,
+        activeTime: 0,
+        lastActivated: nowDays,
         isActive: true,
         effortScores: effortScores,
     }
@@ -31,45 +31,23 @@ export function generateRandomCode(length, characters) {
     return result;
 }
 
-// include this in the code
-export async function toggleUserActiveStatus(houseID, userID) {
-    const houseDoc = await firestore.collection("houses").doc(houseID).get();
-    const house = houseDoc.data();
-    const isActive = house.occupants[userID].isActive;
-
-    if (isActive) {
-        const lastActivated = house.occupants[userID].lastActivated;
-        const activeSeconds = house.occupants[userID].activeSeconds;
-        const now = new Date();
-        const ellapsedSeconds = (now.getTime() - lastActivated.getTime()) / 1000;
-        const newActiveSeconds = activeSeconds + ellapsedSeconds;
-        await firestore.collection("houses").doc(houseID).update({
-            ["occupants." + userID + ".activeSeconds"]: newActiveSeconds,
-            ["occupants." + userID + ".isActive"]: false,
-        });
-    } else {
-        await firestore.collection("houses").doc(houseID).update({
-            ["occupants." + userID + ".lastActivated"]: now,
-            ["occupants." + userID + ".isActive"]: true,
-        });
-    }
-}
-
 
 export function getAverageEffortScoreGivenTask(houseDoc, taskID) {
     const occupants = houseDoc.get("occupants");
     let totalEffortScore = 0;
+    const occupantIDs = Object.keys(occupants);
     // for every occupant in occupants get their effort score for the task and add it to totalEffortScore
-    for (let occupantID in Object.keys(occupants)) {
+    occupantIDs.forEach(occupantID => {
         const occupant = occupants[occupantID];
         const effortScore = occupant.effortScores[taskID];
         totalEffortScore += effortScore;
-    }
+    });
 
-    const denominator = occupants.length;
+    const denominator = occupantIDs.length;
     if (denominator === 0) {
         return null;
     }
+
     return totalEffortScore / denominator;
 }
 

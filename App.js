@@ -20,6 +20,7 @@ import { AuthContext } from './src/contexts/authContext';
 import { Tasks } from './src/pages/tasks/tasks';
 import { CreateHouse } from './src/pages/createHouse/createHouse';
 import { JoinHouse } from './src/pages/joinHouse/joinHouse';
+import { Assignments } from './src/pages/assignments/assignments';
 
 const Stack = createStackNavigator();
 
@@ -87,6 +88,11 @@ export default function App() {
                             <Stack.Screen
                                 name="Edit Task"
                                 component={EditTask}
+                            />
+
+                            <Stack.Screen
+                                name="Assignments"
+                                component={Assignments}
                             />
 
                         </Stack.Navigator>

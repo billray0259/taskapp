@@ -14,20 +14,20 @@ function HouseListItem(args) {
         const houseDoc = await firestore().collection("houses").doc(houseID).get();
         const house = houseDoc.data();
         const isActive = house.occupants[memberID].isActive;
-        const nowSeconds = Date.now()/1000;
+        const nowDays = Date.now() / (60 * 60 * 24 * 1000);
 
         if (isActive) {
-            const lastActivatedSeconds = house.occupants[memberID].lastActivated;
-            const activeSeconds = house.occupants[memberID].activeSeconds;
-            const ellapsedSeconds = nowSeconds - lastActivatedSeconds;
-            const newActiveSeconds = activeSeconds + ellapsedSeconds;
+            const lastActivated = house.occupants[memberID].lastActivated;
+            const activeTime = house.occupants[memberID].activeTime;
+            const ellapsedTime = nowDays - lastActivated;
+            const newActiveTime = activeTime + ellapsedTime;
             await firestore().collection("houses").doc(houseID).update({
-                ["occupants." + memberID + ".activeSeconds"]: newActiveSeconds,
+                ["occupants." + memberID + ".activeTime"]: newActiveTime,
                 ["occupants." + memberID + ".isActive"]: false,
             });
         } else {
             await firestore().collection("houses").doc(houseID).update({
-                ["occupants." + memberID + ".lastActivated"]: nowSeconds,
+                ["occupants." + memberID + ".lastActivated"]: nowDays,
                 ["occupants." + memberID + ".isActive"]: true,
             });
         }

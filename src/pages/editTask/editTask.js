@@ -43,19 +43,20 @@ function EditTaskForm(args) {
 
     const house = houseDoc.data();
     const isNewTask = taskID === undefined;
+    const nowDays = Date.now() / (1000 * 24 * 60 * 60);
 
     const task = !isNewTask ? house.tasks[taskID] : {
         name: "",
         description: "",
         period: 1,
-        lastCompleted: Date.now(),
+        lastCompleted: nowDays,
     };
 
     const [taskName, setTaskName] = useState(task.name);
     const [taskDescription, setTaskDescription] = useState(task.description);
     const [period, setPeriod] = useState(task.period); // in days
-    const [completedDaysAgo, setCompletedDaysAgo] = useState(Math.round((Date.now() - task.lastCompleted) / (1000 * 60 * 60 * 24)));
-    const lastCompleted = Date.now() - completedDaysAgo * 1000 * 60 * 60 * 24;
+    const [completedDaysAgo, setCompletedDaysAgo] = useState(Math.round((nowDays - task.lastCompleted) / (1000 * 60 * 60 * 24)));
+    const lastCompleted = nowDays - completedDaysAgo;
 
     const onExit = () => {
         navigation.navigate("Tasks", {
@@ -133,6 +134,8 @@ function submitEdit(houseDoc, taskID, taskName, taskDescription, period, lastCom
     if (!validateTask(taskName, taskDescription, period, lastCompleted)) {
         return false;
     }
+
+    // period *= 24 * 60 * 60; // convert to seconds
 
     const house = houseDoc.data();
     const uuid = generateRandomCode(20, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
