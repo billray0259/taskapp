@@ -67,22 +67,3 @@ export function Tasks({route, navigation}) {
         </ButtonPage>
     );
 }
-
-            // <View>
-            //     {taskIDs.map((taskID) => {
-            //         const task = house.tasks[taskID];
-
-            //         return (
-            //             <ListItem
-            //                 key={taskID}
-            //                 onPress={() => navigation.navigate("Edit Task", {houseID: houseID, taskID: taskID})}
-            //             >
-            //                 <ListItem.Content>
-            //                     <ListItem.Title>{task.name}</ListItem.Title>
-            //                     <ListItem.Subtitle>{task.description}</ListItem.Subtitle>
-            //                 </ListItem.Content>
-            //                 <ListItem.Chevron />
-            //             </ListItem>
-            //         );
-            //     })}
-            // </View>

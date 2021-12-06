@@ -6,7 +6,6 @@ import { useState, useContext } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, SectionList } from 'react-native';
 
 import { Assigment } from './assignment';
-// import { AssignmentList } from './assignmentList';
 import { getAssignments, getPoints } from './assignmentLogic';
 
 import { cloneObject } from '../../lib/util';
@@ -93,8 +92,6 @@ export function Assignments({ navigation }) {
         });
     });
 
-    
-
     // Show two lists
     // My Assignments
     // Other Assignments
@@ -123,68 +120,6 @@ export function Assignments({ navigation }) {
             setHouseDocs(newHouseDocs);
         });
     }
-
-    // return (
-    //     <View style={styles.container}>
-    //         <View style={styles.assignmentList}>
-    //             <Text style={styles.title}>My Assignments</Text>
-    //             {Object.keys(myAssignments).map(houseID => {
-    //                 return (
-    //                     <View>
-    //                         <Text style={styles.assignmentListTitle}>{houseDocs[houseID].data().name}</Text>
-    //                         {myAssignments[houseID].map(taskIDs => {
-    //                             return taskIDs.map(taskID => {
-    //                                 return Assigment(houseDocs[houseID], taskID, user.uid, () => {
-    //                                     onComplete(houseDocs[houseID], taskID, user.uid);
-    //                                 });
-    //                             });
-    //                         })}
-    //                     </View>
-    //                 );
-    //             })}
-    //         </View>
-    //         <View style={styles.assignmentList}>
-    //             <Text style={styles.title}>Other Assignments</Text>
-    //             {Object.keys(otherAssignments).map(houseID => {
-    //                 return (
-    //                     <View>
-    //                         <Text style={styles.assignmentListTitle}>{houseDocs[houseID].data().name}</Text>
-    //                         {otherAssignments[houseID].map(taskIDs => {
-    //                             return taskIDs.map(taskID => {
-    //                                 return Assigment(houseDocs[houseID], taskID, user.uid, () => {
-    //                                     onComplete(houseDocs[houseID], taskID, user.uid);
-    //                                 });
-    //                             });
-    //                         })}
-    //                     </View>
-    //                 );
-    //             })}
-    //         </View>
-    //     </View>
-    // );
-
-    // return (
-    //     <View style={styles.container}>
-    //         <View style={styles.assignmentList}>
-    //             <Text style={styles.title}>My Assignments</Text>
-    //             <AssignmentList
-    //                 houseDocs={houseDocs}
-    //                 occupantID={user.uid}
-    //                 assignments={myAssignments}
-    //                 onComplete={onComplete}
-    //             />
-    //         </View>
-    //         <View style={styles.assignmentList}>
-    //             <Text style={styles.title}>Other Assignments</Text>
-    //             <AssignmentList
-    //                 houseDocs={houseDocs}
-    //                 occupantID={user.uid}
-    //                 assignments={otherAssignments}
-    //                 onComplete={onComplete}
-    //             />
-    //         </View>
-    //     </View>
-    // );
 
     return (
         <SectionList
