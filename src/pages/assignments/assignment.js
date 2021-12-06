@@ -1,8 +1,8 @@
 import React from 'react';
 import { ListItem, Button } from 'react-native-elements';
-import { getPoints } from './assignmentLogic';
+import { getPoints, completeTask } from './assignmentLogic';
 
-export function Assigment(houseDoc, taskID, occupantID, onComplete) {
+export function Assigment({houseDoc, taskID, occupantID, onComplete}) {
     const house = houseDoc.data();
     const task = house.tasks[taskID];
     const nowDays = Date.now() / 1000 / 60 / 60 / 24;
@@ -18,7 +18,7 @@ export function Assigment(houseDoc, taskID, occupantID, onComplete) {
                 <ListItem.Subtitle>{task.description}</ListItem.Subtitle>
                 <Button
                     title="Complete"
-                    onPress={onComplete}
+                    onPress={() => onComplete(houseDoc, taskID, occupantID)}
                 />
             </ListItem.Content>
         </ListItem>

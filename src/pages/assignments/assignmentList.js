@@ -1,36 +1,44 @@
 import { Assigment } from './assignment';
+import { FlatList } from 'react-native';
+import React from 'react';
 
-export function AssignmentList(occupantID, houseDocs, assignments) {
-    // Renders a list of assignments
-
-    // houseDocs:
-    //     houseID 0:
-    //         tasks:
-    //             taskID 0:
-    //                 name:
-    //                 description:
-    //             taskID 1:
-    //                 name:
-    //                 description:
-    //     houseID 1:
-    //         tasks:
-    //             taskID 0:
-    //                 name:
-    //                 description:
-    //             taskID 1:
-    //                 name:
-    //                 description:
-
-    // assignments:
-    //     houseID 0:
-    //         OccupantID 0: taskID array
-    //         OccupantID 1: taskID array
-    //     houseID 1:
-    //         OccupantID 0: taskID array
-    //         OccupantID 1: taskID array
+export function AssignmentList({houseDocs, occupantID, assignments, onComplete}) {
+    // Renders a list of assignments from multiple houses for a single occupant and occupant.
     
-    // return (
+    // assignments = {
+    //     houseID: [taskID, taskID, ...],
+    //     ...
+    // }
 
-    // );
-    
+    // houseDocs = {
+    //     houseID: { houseDoc },
+    //     ...
+    // }
+
+    const items = [];
+    Object.keys(assignments).forEach(houseID => {
+        assignments[houseID].forEach(taskID => {
+            items.push({
+                houseDoc: houseDocs[houseID],
+                taskID
+            });
+        });
+    });
+
+    return (
+        <FlatList
+            data={items}
+            renderItem={({item}) => {
+                const {houseDoc, taskID} = item;
+                return (
+                    <Assigment
+                        houseDoc={houseDoc}
+                        taskID={taskID}
+                        occupantID={occupantID}
+                        onComplete={onComplete}
+                    />
+                );
+            }}
+        />
+    ); 
 }

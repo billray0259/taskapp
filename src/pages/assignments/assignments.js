@@ -3,10 +3,10 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import firestore from "@react-native-firebase/firestore";
 import { useState, useContext } from 'react';
-import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, SectionList } from 'react-native';
 
 import { Assigment } from './assignment';
-import { AssignmentList } from './assignmentList';
+// import { AssignmentList } from './assignmentList';
 import { getAssignments, getPoints } from './assignmentLogic';
 
 import { cloneObject } from '../../lib/util';
@@ -72,8 +72,9 @@ export function Assignments({ navigation }) {
         assignments[houseID] = getAssignments(house);
     });
 
-    const myAssignments = {};
-    const otherAssignments = {};
+    const myAssignments = [];
+    const otherAssignments = [];
+    
 
     Object.keys(assignments).forEach(houseID => {
         const houseAssignments = assignments[houseID];
@@ -81,12 +82,18 @@ export function Assignments({ navigation }) {
         otherAssignments[houseID] = [];
         Object.keys(houseAssignments).forEach(occupantID => {
             if (occupantID === user.uid) {
-                myAssignments[houseID].push(houseAssignments[occupantID]);
+                houseAssignments[occupantID].forEach(taskID => {
+                    myAssignments.push({houseID, taskID});
+                });
             } else {
-                otherAssignments[houseID].push(houseAssignments[occupantID]);
+                houseAssignments[occupantID].forEach(taskID => {
+                    otherAssignments.push({houseID, taskID});
+                });
             }
         });
     });
+
+    
 
     // Show two lists
     // My Assignments
@@ -117,42 +124,91 @@ export function Assignments({ navigation }) {
         });
     }
 
+    // return (
+    //     <View style={styles.container}>
+    //         <View style={styles.assignmentList}>
+    //             <Text style={styles.title}>My Assignments</Text>
+    //             {Object.keys(myAssignments).map(houseID => {
+    //                 return (
+    //                     <View>
+    //                         <Text style={styles.assignmentListTitle}>{houseDocs[houseID].data().name}</Text>
+    //                         {myAssignments[houseID].map(taskIDs => {
+    //                             return taskIDs.map(taskID => {
+    //                                 return Assigment(houseDocs[houseID], taskID, user.uid, () => {
+    //                                     onComplete(houseDocs[houseID], taskID, user.uid);
+    //                                 });
+    //                             });
+    //                         })}
+    //                     </View>
+    //                 );
+    //             })}
+    //         </View>
+    //         <View style={styles.assignmentList}>
+    //             <Text style={styles.title}>Other Assignments</Text>
+    //             {Object.keys(otherAssignments).map(houseID => {
+    //                 return (
+    //                     <View>
+    //                         <Text style={styles.assignmentListTitle}>{houseDocs[houseID].data().name}</Text>
+    //                         {otherAssignments[houseID].map(taskIDs => {
+    //                             return taskIDs.map(taskID => {
+    //                                 return Assigment(houseDocs[houseID], taskID, user.uid, () => {
+    //                                     onComplete(houseDocs[houseID], taskID, user.uid);
+    //                                 });
+    //                             });
+    //                         })}
+    //                     </View>
+    //                 );
+    //             })}
+    //         </View>
+    //     </View>
+    // );
+
+    // return (
+    //     <View style={styles.container}>
+    //         <View style={styles.assignmentList}>
+    //             <Text style={styles.title}>My Assignments</Text>
+    //             <AssignmentList
+    //                 houseDocs={houseDocs}
+    //                 occupantID={user.uid}
+    //                 assignments={myAssignments}
+    //                 onComplete={onComplete}
+    //             />
+    //         </View>
+    //         <View style={styles.assignmentList}>
+    //             <Text style={styles.title}>Other Assignments</Text>
+    //             <AssignmentList
+    //                 houseDocs={houseDocs}
+    //                 occupantID={user.uid}
+    //                 assignments={otherAssignments}
+    //                 onComplete={onComplete}
+    //             />
+    //         </View>
+    //     </View>
+    // );
+
     return (
-        <View style={styles.container}>
-            <View style={styles.assignmentList}>
-                <Text style={styles.title}>My Assignments</Text>
-                {Object.keys(myAssignments).map(houseID => {
-                    return (
-                        <View>
-                            <Text style={styles.assignmentListTitle}>{houseDocs[houseID].data().name}</Text>
-                            {myAssignments[houseID].map(taskIDs => {
-                                return taskIDs.map(taskID => {
-                                    return Assigment(houseDocs[houseID], taskID, user.uid, () => {
-                                        onComplete(houseDocs[houseID], taskID, user.uid);
-                                    });
-                                });
-                            })}
-                        </View>
-                    );
-                })}
-            </View>
-            <View style={styles.assignmentList}>
-                <Text style={styles.title}>Other Assignments</Text>
-                {Object.keys(otherAssignments).map(houseID => {
-                    return (
-                        <View>
-                            <Text style={styles.assignmentListTitle}>{houseDocs[houseID].data().name}</Text>
-                            {otherAssignments[houseID].map(taskIDs => {
-                                return taskIDs.map(taskID => {
-                                    return Assigment(houseDocs[houseID], taskID, user.uid, () => {
-                                        onComplete(houseDocs[houseID], taskID, user.uid);
-                                    });
-                                });
-                            })}
-                        </View>
-                    );
-                })}
-            </View>
-        </View>
+        <SectionList
+            sections={[
+                {title: "My Assignments", data: myAssignments},
+                {title: "Other Assignments", data: otherAssignments}
+            ]}
+            renderSectionHeader={({section}) => {
+                return (
+                    <Text style={styles.title}>
+                        {section.title}
+                    </Text>
+                );
+            }}
+            renderItem={({item}) => {
+                return (
+                    <Assigment
+                        houseDoc={houseDocs[item.houseID]}
+                        taskID={item.taskID}
+                        occupantID={user.uid}
+                        onComplete={onComplete}
+                    />
+                );
+            }}
+        />
     );
 }

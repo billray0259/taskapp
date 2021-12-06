@@ -1,8 +1,9 @@
 import { cloneObject } from '../../lib/util';
 
-export function isolateTasks(house) {
-    // Return the task IDs of the tasks that are ready to be assigned
-    // greater than 75% of the way through their cycle
+export function splitTasks(house) {
+    // splits the tasks into two groups
+    // `isolatedTasks` are the tasks that are > 75% through their cycle
+    // `otherTasks` are the task that are < 75% through their cycle
 
     const nowDays = Date.now() / 1000 / 60 / 60 / 24;
     
@@ -108,13 +109,13 @@ export function valueAdded(house, occupantID, taskID) {
 
 export function getAssignments(house) {
     // Returns map of occupantID -> taskID array
-    // Only includes tasks that are ready to be assigned (greater than 75% of the way through their cycle)
+    // Maps null -> taskID array of tasks that are not assigned
 
     const houseClone = cloneObject(house);
-    const { isolatedTasks, otherTasks } = isolateTasks(houseClone);
+    const { isolatedTasks, otherTasks } = splitTasks(houseClone);
     const assignments = {};
 
-    assignments[null] = [];
+    assignments[null] = []; // Assign other tasks to null (no one is assigned them)
     Object.keys(otherTasks).forEach(taskID => {
         assignments[null].push(taskID);
     });
