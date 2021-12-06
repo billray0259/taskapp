@@ -1,5 +1,4 @@
 
-
 export function generateNewOccupant(memberDisplayName, effortScores) {
     if (effortScores === undefined) {
         effortScores = {};
@@ -9,7 +8,7 @@ export function generateNewOccupant(memberDisplayName, effortScores) {
 
     return {
         displayName: memberDisplayName,
-        nSummedPoints: 0,
+        points: 0,
         lastSummedTime: nowDays,
         activeTime: 0,
         lastActivated: nowDays,
@@ -29,6 +28,10 @@ export function generateRandomCode(length, characters) {
         result += characters.charAt(randomIndex);
     }
     return result;
+}
+
+export function cloneObject(object) {
+    return JSON.parse(JSON.stringify(object));
 }
 
 

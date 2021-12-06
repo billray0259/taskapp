@@ -66,13 +66,13 @@ function EditTaskForm(args) {
     }
 
     const onSubmit = () => {
-        if (submitEdit(houseDoc, taskID, taskName, taskDescription, period, lastCompleted)) {
+        if (submitEdit(houseDoc, taskID, taskName, taskDescription, parseFloat(period), lastCompleted)) {
             onExit();
         }
     }
 
     const onDelete = () => {
-        Alert.alert("Delete House", "Are you sure you want to delete this task?", [
+        Alert.alert("Delete Task", "Are you sure you want to delete this task?", [
             {text: "Cancel", style: "cancel"},
             {text: "Delete", onPress: () => {
                 if (deleteTask(houseDoc, taskID)) {

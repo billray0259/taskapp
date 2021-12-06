@@ -53,7 +53,7 @@ Equitably assign tasks to roommates. Collaboratively create a list of periodic t
         * Roommates
         * Roommates active time
     
-* Todo
+* Assignments
     * Your Tasks
         * List of tasks assigned to you grouped by room
     * Other Tasks

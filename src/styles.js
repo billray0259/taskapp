@@ -25,5 +25,10 @@ export const styles = StyleSheet.create({
     list: {
         height: '50%',
     },
-
+    assignment: {
+        borderWidth: 1,
+        borderColor: 'black',
+        margin: 10,
+        padding: 10,
+    },
 });
