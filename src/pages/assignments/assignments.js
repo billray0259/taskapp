@@ -6,7 +6,7 @@ import { useState, useContext } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, SectionList } from 'react-native';
 
 import { Assigment } from './assignment';
-import { getAssignments, getPoints } from './assignmentLogic';
+import { getAssignments, getPoints, getCyclePercentage, declineTask } from './assignmentLogic';
 
 import { cloneObject } from '../../lib/util';
 import { styles } from '../../styles';
@@ -82,21 +82,39 @@ export function Assignments({ navigation }) {
         Object.keys(houseAssignments).forEach(occupantID => {
             if (occupantID === user.uid) {
                 houseAssignments[occupantID].forEach(taskID => {
-                    myAssignments.push({houseID, taskID});
+                    myAssignments.push({houseID, taskID, myTask: true});
                 });
             } else {
                 houseAssignments[occupantID].forEach(taskID => {
-                    otherAssignments.push({houseID, taskID});
+                    otherAssignments.push({houseID, taskID, myTask: false});
                 });
             }
         });
     });
 
+    function compare(a, b) {
+        const taskA = houseDocs[a.houseID].data().tasks[a.taskID];
+        const taskB = houseDocs[b.houseID].data().tasks[b.taskID];
+        const taskACyclePercentage = getCyclePercentage(taskA);
+        const taskBCyclePercentage = getCyclePercentage(taskB);
+        if (taskACyclePercentage > taskBCyclePercentage) {
+            return -1;
+        }
+        if (taskACyclePercentage < taskBCyclePercentage) {
+            return 1;
+        }
+        return 0;
+    }
+
+    myAssignments.sort(compare);
+    otherAssignments.sort(compare);
+
     // Show two lists
     // My Assignments
     // Other Assignments
 
-    function onComplete(houseDoc, taskID, occupantID) {
+    function onComplete(houseDoc, taskID) {
+        const occupantID = user.uid;
         const house = houseDoc.data();
         // update task lastCompleted
         const houseClone = cloneObject(house);
@@ -105,7 +123,8 @@ export function Assignments({ navigation }) {
 
         // add points to user
         houseClone.occupants[occupantID].points += taskPoints;
-        // update user effort score
+
+        // update user effort score by reducing score by 10%
         const currentEffortScore = houseClone.occupants[occupantID].effortScores[taskID];
         const newEffortScore = currentEffortScore * 0.9;
         houseClone.occupants[occupantID].effortScores[taskID] = newEffortScore;
@@ -119,6 +138,21 @@ export function Assignments({ navigation }) {
             newHouseDocs[houseDoc.id] = await firestore().collection("houses").doc(houseDoc.id).get();
             setHouseDocs(newHouseDocs);
         });
+    }
+
+    function onDecline(houseDoc, taskID) {
+        declineTask(houseDoc, user.uid, taskID).then(houseDoc => {
+            const newHouseDocs = {};
+            Object.keys(houseDocs).forEach(houseID => {
+                newHouseDocs[houseID] = houseDocs[houseID];
+            });
+            newHouseDocs[houseDoc.id] = houseDoc;
+            setHouseDocs(newHouseDocs);
+        });
+    }
+
+    function onDelay(houseDoc, taskID, occupantID) {
+        
     }
 
     return (
@@ -140,7 +174,10 @@ export function Assignments({ navigation }) {
                         houseDoc={houseDocs[item.houseID]}
                         taskID={item.taskID}
                         occupantID={user.uid}
+                        myTask={item.myTask}
                         onComplete={onComplete}
+                        onDecline={onDecline}
+                        onDelay={onDelay}
                     />
                 );
             }}

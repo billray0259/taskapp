@@ -21,6 +21,7 @@ import { Tasks } from './src/pages/tasks/tasks';
 import { CreateHouse } from './src/pages/createHouse/createHouse';
 import { JoinHouse } from './src/pages/joinHouse/joinHouse';
 import { Assignments } from './src/pages/assignments/assignments';
+import { Test } from './src/pages/test/test';
 
 const Stack = createStackNavigator();
 
@@ -95,6 +96,11 @@ export default function App() {
                                 component={Assignments}
                             />
 
+
+                            <Stack.Screen
+                                name="Test"
+                                component={Test}
+                            />
                         </Stack.Navigator>
                     </NavigationContainer>
                 </AuthContext.Provider>

@@ -1,20 +1,25 @@
 import { cloneObject } from '../../lib/util';
+import firestore from "@react-native-firebase/firestore";
+
+export function getCyclePercentage(task) {
+    const nowDays = Date.now() / 1000 / 60 / 60 / 24;
+    const timeSinceLastCompleted = nowDays - task.lastCompleted;
+    const percentage = timeSinceLastCompleted / task.period;
+    return percentage;
+}
 
 export function splitTasks(house) {
     // splits the tasks into two groups
     // `isolatedTasks` are the tasks that are > 75% through their cycle
     // `otherTasks` are the task that are < 75% through their cycle
-
-    const nowDays = Date.now() / 1000 / 60 / 60 / 24;
     
     const tasksIDs = Object.keys(house.tasks);
     const isolatedTasks = {};
     const otherTasks = {};
     tasksIDs.forEach(taskID => {
         const task = house.tasks[taskID];
-        const timeSinceLastCompleted = nowDays - task.lastCompleted;
-        const percentage = timeSinceLastCompleted / task.period;
-        if (percentage > 0.0) {
+        const percentage = getCyclePercentage(task)
+        if (percentage > 0.75) {
             isolatedTasks[taskID] = task;
         } else {
             otherTasks[taskID] = task;
@@ -145,4 +150,43 @@ export function getAssignments(house) {
         delete isolatedTasks[maxValueAddedTaskID];
     }
     return assignments;
+}
+
+export async function completeTask(houseDoc, occupandID, taskID) {
+    const occupantID = user.uid;
+    const house = houseDoc.data();
+    // update task lastCompleted
+    const houseClone = cloneObject(house);
+    houseClone.tasks[taskID].lastCompleted = Date.now() / 1000 / 60 / 60 / 24;
+    const taskPoints = getPoints(house, occupantID, taskID);
+
+    // add points to user
+    houseClone.occupants[occupantID].points += taskPoints;
+
+    // update user effort score by reducing score by 10%
+    const currentEffortScore = houseClone.occupants[occupantID].effortScores[taskID];
+    const newEffortScore = currentEffortScore * 0.9;
+    houseClone.occupants[occupantID].effortScores[taskID] = newEffortScore;
+
+    return await firestore().collection("houses").doc(houseDoc.id).set(houseClone).then(async () => {
+        return firestore().collection("houses").doc(houseDoc.id).get();
+    });
+}
+
+export async function declineTask(houseDoc, occupantID, taskID) {
+    // Increase the effort score of the task until it is no longer assigned to the occupant
+    // Returns a Promise<DocumentSnapshot<>> of the updated house
+    
+    const house = houseDoc.data();
+    const houseClone = cloneObject(house);
+    let assignments = getAssignments(houseClone);
+    // check if taskID is in assignments[occupantID]
+    while (assignments[occupantID] !== undefined && assignments[occupantID].indexOf(taskID) !== -1) {
+        houseClone.occupants[occupantID].effortScores[taskID] *= 1.1;
+        assignments = getAssignments(houseClone);
+    }
+
+    return await firestore().collection("houses").doc(houseDoc.id).set(houseClone).then(async () => {
+        return firestore().collection("houses").doc(houseDoc.id).get();
+    });
 }

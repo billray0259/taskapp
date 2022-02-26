@@ -50,6 +50,14 @@ export function Home({ navigation }) {
                 }}
                 title="Assignments"
             />
+
+
+            <Button
+                onPress={() => {
+                    navigation.navigate("Test");
+                }}
+                title="Test"
+            />
         </View>
     );
 }
